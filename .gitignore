@@ -1,0 +1,442 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
+.DS_Store
+.pytest_cache/
+htmlcov/
+.hypothesis/
+
+# Virtual Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Database
+*.db
+*.db-journal
+todo_app.db
+
+# Local environment
+.env*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+.eggs/
+eggs/
+
+# Node.js (for frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/.nuxt/
+frontend/.output/
+frontend/.vercel/
+frontend/.netlify/
+frontend/netlify-cache/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/logs/
+frontend/node_modules/
+frontend/.env*
+frontend/!.env.example
+frontend/.eslintcache
+frontend/.prettierignore
+frontend/.prettierc
+frontend/.stylelintcache
+frontend/.turbo/
+frontend/.nx/
+frontend/coverage/
+frontend/.nyc_output/
+frontend/nyc_output/
+frontend/.nyc_coverage/
+frontend/.istanbul.yml
+frontend/.babel_cache/
+frontend/.cache/
+frontend/.temp/
+frontend/tmp/
+frontend/.tmp/
+frontend/flow-typed/
+frontend/.fusebox/
+frontend/.serverless/
+frontend/.webpack/
+frontend/webpack-stats.json
+frontend/.vscode/
+frontend/.idea/
+
+# Backend Python build artifacts
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/PYTHONCACHE/
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/coverage.xml
+backend/.hypothesis/
+backend/.tox/
+backend/build/
+backend/dist/
+backend/*.egg-info/
+backend/.eggs/
+backend/eggs/
+backend/.env*
+backend/!.env.example
+backend/.vscode/
+backend/.idea/
+backend/*.db
+backend/*.db-journal
+backend/todo_app.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+lib-cov/
+instrumented/
+
+# Temporary folders
+tmp/
+temp/
+tmp*/
+temp*/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.nfs
+*~
+.#*
+*#
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Editor-specific files
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# IntelliJ IDEA
+.idea/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+syntax_on
+tabstop_uni
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+# Org-mode
+*.org~
+*.txt~
+
+# Python specific
+*.pyc
+__pycache__/
+*$py.class
+*$pyc.class
+*$pyo.class
+*$folder$
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+# JetBrains specific template is maintained in a separate JetBrains.gitignore that can be found at:
+# https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+# and can be added to the global gitignore or merged into this file.
+.idea/
+
+# Coverage and profiling
+coverage.xml
+*.coverage
+*.gcov
+*.lcov
+*.lst
+*.profdata
+*.profclang
+*.profraw
+*.prof
+
+# Documentation
+docs/_build/
+*.tar.gz
+*.whl
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg
+*.egg-info/
+.installed.cfg
+*.egg-link
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.cover/
+.coverage*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+# JetBrains specific template is maintained in a separate JetBrains.gitignore that can be found at:
+# https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+# and can be added to the global gitignore or merged into this file.
+.idea/
+
+# Pylint
+.pylintrc
+
+# PTVSD
+ptvsd/
+.vscode/.ptvsd/
+
+# End of .gitignore

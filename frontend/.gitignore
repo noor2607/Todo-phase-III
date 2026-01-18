@@ -1,0 +1,81 @@
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+build/
+.next/
+.out/
+
+# Environment variables
+.env*
+!.env.example
+
+# Logs
+*.log
+
+# Runtime data
+.pnp/
+.pnp.js
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Next.js
+.next
+.next
+out/
+
+# Production
+build/
+
+# Debug
+.vscode-test
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# Temporary folders
+tmp/
+temp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+.nyc_output/
+
+# CI
+.semaphore
+
+# Sentry
+.sentry-cli/
+.sentry-cli-config

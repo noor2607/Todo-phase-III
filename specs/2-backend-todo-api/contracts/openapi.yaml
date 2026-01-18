@@ -1,0 +1,318 @@
+# Contract: Backend Todo API OpenAPI Specification
+
+openapi: 3.0.3
+info:
+  title: Backend Todo API
+  description: Secure todo management API with JWT authentication
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /api/tasks:
+    get:
+      summary: Get user's tasks with filtering and sorting
+      description: Retrieve all tasks owned by the authenticated user with optional filtering and sorting
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter tasks by completion status
+          required: false
+          schema:
+            type: string
+            enum: [all, completed, pending]
+            default: all
+        - name: sort
+          in: query
+          description: Sort tasks by field
+          required: false
+          schema:
+            type: string
+            enum: [created_at, due_date, title]
+            default: created_at
+      responses:
+        '200':
+          description: Successfully retrieved tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Create a new task
+      description: Create a new task for the authenticated user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request - Invalid input data
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '422':
+          description: Validation error - Title exceeds character limits
+
+  /api/tasks/{id}:
+    get:
+      summary: Get a specific task
+      description: Retrieve a specific task owned by the authenticated user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '404':
+          description: Task not found or not owned by user
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update a task
+      description: Update properties of a specific task owned by the authenticated user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request - Invalid input data
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '404':
+          description: Task not found or not owned by user
+        '422':
+          description: Validation error - Title exceeds character limits
+
+    delete:
+      summary: Delete a task
+      description: Delete a specific task owned by the authenticated user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Task deleted successfully"
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '404':
+          description: Task not found or not owned by user
+        '500':
+          description: Internal server error
+
+  /api/tasks/{id}/complete:
+    patch:
+      summary: Toggle task completion status
+      description: Toggle the completion status of a specific task owned by the authenticated user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Task completion status toggled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '404':
+          description: Task not found or not owned by user
+        '500':
+          description: Internal server error
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: string
+          example: "user-12345"
+        title:
+          type: string
+          example: "Complete project proposal"
+        description:
+          type: string
+          example: "Finish the project proposal document"
+          nullable: true
+        completed:
+          type: boolean
+          example: false
+        due_date:
+          type: string
+          format: date-time
+          example: "2023-12-31T23:59:59Z"
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00Z"
+      required:
+        - id
+        - user_id
+        - title
+        - completed
+        - created_at
+        - updated_at
+
+    CreateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: "New task title"
+        description:
+          type: string
+          nullable: true
+          example: "Optional task description"
+        due_date:
+          type: string
+          format: date-time
+          example: "2023-12-31T23:59:59Z"
+          nullable: true
+      required:
+        - title
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: "Updated task title"
+        description:
+          type: string
+          nullable: true
+          example: "Updated task description"
+        due_date:
+          type: string
+          format: date-time
+          example: "2023-12-31T23:59:59Z"
+          nullable: true
+        completed:
+          type: boolean
+          example: true
