@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../providers/AuthProvider';
 import { taskService } from '../services/taskService';
@@ -37,8 +37,9 @@ export default function HomePage() {
     }
   }, [user, authLoading]);
 
-  useEffect(() => {
-    // Apply filters when tasks or filters change
+  const filteredTasksResult = useMemo(() => {
+    if (!tasks) return [];
+
     let result = [...tasks];
 
     // Apply status filter
@@ -60,8 +61,12 @@ export default function HomePage() {
       return filters.sortOrder === 'asc' ? comparison : -comparison;
     });
 
-    setFilteredTasks(result);
+    return result;
   }, [tasks, filters]);
+
+  useEffect(() => {
+    setFilteredTasks(filteredTasksResult);
+  }, [filteredTasksResult]);
 
   const loadTasks = async () => {
     try {
