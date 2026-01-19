@@ -85,8 +85,9 @@ export default function HomePage() {
     setEditingTask(null);
   };
 
-  const handleTaskDeleted = (deletedTaskId: number) => {
-    setTasks(tasks.filter(task => task.id !== deletedTaskId));
+  const handleTaskDeleted = (deletedTaskId: string) => {
+    const idAsNumber = Number(deletedTaskId);
+    setTasks(tasks.filter(task => task.id !== idAsNumber));
   };
 
   const handleEditTask = (task: Task) => {

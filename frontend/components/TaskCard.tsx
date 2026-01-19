@@ -1,16 +1,6 @@
 import { useState } from 'react';
 import { taskService } from '../services/taskService';
-
-interface Task {
-  id: number;
-  title: string;
-  description?: string;
-  completed: boolean;
-  due_date?: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Task } from '../types/task';
 
 interface TaskCardProps {
   task: Task;

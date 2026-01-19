@@ -16,7 +16,7 @@ export const taskService = {
       if (sortBy) params.append('sort', sortBy);
 
       const queryString = params.toString();
-      const url = `/api/tasks${queryString ? '?' + queryString : ''}`;
+      const url = `/tasks${queryString ? '?' + queryString : ''}`;
 
       const response = await api.get<Task[]>(url);
       return response.data.data || [];
@@ -34,6 +34,9 @@ export const taskService = {
   createTask: async (taskData: CreateTaskData): Promise<Task> => {
     try {
       const response = await api.post<Task>('/api/tasks', taskData);
+      if (!response.data.data) {
+        throw new Error('Failed to create task: no data returned');
+      }
       return response.data.data;
     } catch (error) {
       console.error('Error creating task:', error);
@@ -49,6 +52,9 @@ export const taskService = {
   getTaskById: async (taskId: number): Promise<Task> => {
     try {
       const response = await api.get<Task>(`/api/tasks/${taskId}`);
+      if (!response.data.data) {
+        throw new Error(`Failed to fetch task with ID ${taskId}: no data returned`);
+      }
       return response.data.data;
     } catch (error) {
       console.error(`Error fetching task with ID ${taskId}:`, error);
@@ -65,6 +71,9 @@ export const taskService = {
   updateTask: async (taskId: number, taskData: UpdateTaskData): Promise<Task> => {
     try {
       const response = await api.put<Task>(`/api/tasks/${taskId}`, taskData);
+      if (!response.data.data) {
+        throw new Error(`Failed to update task with ID ${taskId}: no data returned`);
+      }
       return response.data.data;
     } catch (error) {
       console.error(`Error updating task with ID ${taskId}:`, error);
@@ -80,6 +89,9 @@ export const taskService = {
   toggleTaskCompletion: async (taskId: number): Promise<Task> => {
     try {
       const response = await api.patch<Task>(`/api/tasks/${taskId}/complete`);
+      if (!response.data.data) {
+        throw new Error(`Failed to toggle completion for task with ID ${taskId}: no data returned`);
+      }
       return response.data.data;
     } catch (error) {
       console.error(`Error toggling completion for task with ID ${taskId}:`, error);
