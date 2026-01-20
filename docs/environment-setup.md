@@ -17,7 +17,7 @@
 
 | Variable | Description | Default Value | Required |
 |----------|-------------|---------------|----------|
-| `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL | `http://localhost:8000` | Yes |
+| `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL | `https://larebnoor-todo-backend.hf.space/` | Yes |
 | `NEXTAUTH_URL` | NextAuth base URL | `http://localhost:3000` | Yes |
 | `NEXTAUTH_SECRET` | NextAuth signing secret | `fallback-dev-secret` | Yes |
 
@@ -48,7 +48,7 @@ pip install -r requirements.txt
 1. Create a `.env` file in the `frontend` directory:
 
 ```bash
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_API_BASE_URL=https://larebnoor-todo-backend.hf.space/
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-own-secret-here
 ```

@@ -40,7 +40,7 @@ This document lists all environment variables required for the Todo Full-Stack A
 
 ### Required Variables
 - `NEXT_PUBLIC_API_BASE_URL`: Backend API base URL
-  - Example: `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000`
+  - Example: `NEXT_PUBLIC_API_BASE_URL=https://larebnoor-todo-backend.hf.space/`
   - Note: Must be prefixed with `NEXT_PUBLIC_` to be accessible in browser
 
 ### Optional Variables
@@ -111,7 +111,7 @@ ENVIRONMENT=docker
 LOG_LEVEL=info
 ALLOWED_ORIGINS=http://localhost:3000
 JWT_EXPIRATION_HOURS=24
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_API_BASE_URL=https://larebnoor-todo-backend.hf.space/
 ```
 
 ## Testing Environment Variables
@@ -126,7 +126,7 @@ ENVIRONMENT=testing
 LOG_LEVEL=error
 ALLOWED_ORIGINS=*
 JWT_EXPIRATION_HOURS=168
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_API_BASE_URL=https://larebnoor-todo-backend.hf.space/
 ```
 
 ## Configuration Validation

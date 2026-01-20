@@ -7,7 +7,7 @@ This document outlines the user acceptance tests conducted to validate the Todo 
 - Application Version: 1.0.0
 - Operating System: Windows 10/11
 - Browsers Tested: Chrome 120+, Firefox 115+, Safari 16+
-- Backend: FastAPI server running on http://localhost:8000
+- Backend: FastAPI server running on https://larebnoor-todo-backend.hf.space/
 - Frontend: Next.js application running on http://localhost:3000
 
 ## Test Scenarios

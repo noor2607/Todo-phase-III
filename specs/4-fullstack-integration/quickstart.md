@@ -23,7 +23,7 @@ LOG_LEVEL=info
 
 #### Frontend (.env in frontend directory)
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_API_BASE_URL=https://larebnoor-todo-backend.hf.space/
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-nextauth-secret
 ```
@@ -48,8 +48,8 @@ npm run dev
 
 3. **Access the application:**
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Backend API docs: http://localhost:8000/docs
+- Backend API: https://larebnoor-todo-backend.hf.space/
+- Backend API docs: https://larebnoor-todo-backend.hf.space/docs
 
 ### Option 2: Docker Compose (Recommended for production-like environment)
 

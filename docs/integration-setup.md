@@ -61,8 +61,8 @@ npm run dev
 
 #### 4. Access the application
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Backend API docs: http://localhost:8000/docs
+- Backend API: https://larebnoor-todo-backend.hf.space/
+- Backend API docs: https://larebnoor-todo-backend.hf.space/docs
 
 ### Option 2: Docker Setup (Recommended for production-like environment)
 
