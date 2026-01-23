@@ -62,7 +62,7 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
       };
 
       // Call the backend API
-      const response = await fetch(`/api/${user.id}/chat`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${user.id}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,80 +1,67 @@
-# Backend Todo API
+# Todo AI Chatbot
 
-Secure todo management API with JWT authentication for the Todo Full-Stack Web Application.
+This project consists of a Next.js frontend deployed on Vercel and a FastAPI backend deployed on Hugging Face Spaces.
+
+## Project Structure
+
+- `frontend/` - Next.js frontend application
+- `backend_todo_chatbot/` - FastAPI backend application for AI chat functionality
 
 ## Overview
 
-This is a backend API built with Python FastAPI and SQLModel that provides full CRUD operations for user tasks with strict authentication and authorization enforcement using JWT tokens compatible with Better Auth, ensuring complete data isolation between users.
+This is a full-stack todo application with AI chatbot functionality. The project uses a dual-backend approach:
+- Main backend for authentication and task management
+- Separate AI chatbot backend for natural language processing
 
-## Setup Instructions
+## Configuration
 
-1. **Clone and navigate to project**
-   ```bash
-   git clone <repository-url>
-   cd <project-directory>
-   ```
+### Frontend (Deployed at https://todo-phase-iii.vercel.app/)
 
-2. **Create virtual environment and install dependencies**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+The frontend is configured to connect to two different backends using separate environment variables:
 
-3. **Configure environment variables**
-   Copy `.env.example` to `.env` and set:
-   ```bash
-   DATABASE_URL="postgresql://username:password@localhost:5432/todo_db"
-   BETTER_AUTH_SECRET="your-secret-key-here"
-   ```
+1. **Main Backend** (Authentication & Task Management):
+   - Uses `NEXT_PUBLIC_API_BASE_URL` environment variable
+   - Handles user authentication, registration, login, and task CRUD operations
 
-4. **Initialize database**
-   ```bash
-   # Run database migrations
-   python -c "from backend.src.database.engine import init_db; init_db()"
-   ```
+2. **Chatbot Backend** (AI Chat Functionality):
+   - Uses `NEXT_PUBLIC_BACKEND_URL` environment variable
+   - Currently set to: `https://larebnoor-todo-chatbot.hf.space/`
+   - Handles AI chat functionality and natural language processing
 
-5. **Start the development server**
-   ```bash
-   uvicorn backend.src.main:app --reload --port 8000
-   ```
+### Backend (Deployed at https://larebnoor-todo-chatbot.hf.space)
 
-## API Endpoints
+The chatbot backend is configured with CORS to allow requests from:
+- `https://todo-phase-iii.vercel.app` (production frontend)
+- `http://localhost:3000` (local development)
+- `http://localhost:3001` (alternative local port)
+- `http://localhost:8000` (backend local server)
 
-### Authentication
-All endpoints require a valid JWT token in the Authorization header:
-```
-Authorization: Bearer <jwt-token>
-```
+## Files Using Each Backend
 
-### Task Operations
+### Main Backend (`NEXT_PUBLIC_API_BASE_URL`)
+- `frontend/app/signin/page.tsx` - Login functionality
+- `frontend/app/signup/page.tsx` - Registration functionality
+- `frontend/lib/api.ts` - Base API client (default for most requests)
+- `frontend/services/taskService.ts` - Task management operations
 
-**GET** `/api/tasks`
-- Query parameters: `status` (all/completed/pending), `sort` (created_at/due_date)
-- Returns: Array of user's tasks
-
-**POST** `/api/tasks`
-- Body: `{ "title": "Task title", "description": "Optional description", "due_date": "ISO datetime" }`
-- Returns: Created task object
-
-**GET** `/api/tasks/{id}`
-- Returns: Specific task if owned by user
-
-**PUT** `/api/tasks/{id}`
-- Body: `{ "title": "Updated title", "description": "Updated description", "due_date": "ISO datetime", "completed": true/false }`
-- Returns: Updated task object
-
-**PATCH** `/api/tasks/{id}/complete`
-- Toggles completion status
-- Returns: Updated task object
-
-**DELETE** `/api/tasks/{id}`
-- Deletes the task if owned by user
-- Returns: Success confirmation
+### Chatbot Backend (`NEXT_PUBLIC_BACKEND_URL`)
+- `frontend/components/ChatInterface.tsx` - AI chat functionality
 
 ## Environment Variables
 
-- `DATABASE_URL`: PostgreSQL connection string
-- `BETTER_AUTH_SECRET`: Secret key for JWT verification
-- `ENVIRONMENT`: dev/prod/staging
-- `LOG_LEVEL`: debug/info/warn/error
+### Frontend
+- `NEXT_PUBLIC_API_BASE_URL`: Points to the main backend API
+- `NEXT_PUBLIC_BACKEND_URL`: Points to the chatbot backend API (currently https://larebnoor-todo-chatbot.hf.space/)
+
+### Backend
+- `COHERE_API_KEY`: API key for Cohere integration
+- `JWT_SECRET`: Secret for JWT token generation
+- `DATABASE_URL`: Database connection string
+
+## Deployment
+
+### Backend Deployment to Hugging Face Spaces
+The backend can be deployed to Hugging Face Spaces using the provided Dockerfile.
+
+### Frontend Deployment to Vercel
+The frontend can be deployed to Vercel with both environment variables properly configured.

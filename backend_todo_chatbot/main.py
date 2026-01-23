@@ -1,14 +1,18 @@
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, Dict, Any, List
 import os
 import jwt
 from dotenv import load_dotenv
-from .models import *
-from .services import *
-from .database import get_db_session, create_db_and_tables
-from .utils.rate_limiter import rate_limit
-from .agents import TodoAgent
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+
+from src.models import *
+from src.services import *
+from src.database import get_db_session, create_db_and_tables
+from src.utils.rate_limiter import rate_limit
+from src.agents import TodoAgent
 from sqlmodel import Session
 from pydantic import BaseModel
 
@@ -17,6 +21,20 @@ load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI(title="Todo AI Chatbot API", version="1.0.0")
+
+# Add CORS middleware to allow requests from the deployed frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://todo-phase-iii.vercel.app",  # Deployed frontend
+        "http://localhost:3000",              # Local development
+        "http://localhost:3001",              # Alternative local port
+        "http://localhost:8000",              # Backend local server
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Security scheme
 security = HTTPBearer()

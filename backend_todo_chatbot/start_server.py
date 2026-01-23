@@ -22,11 +22,12 @@ def main():
         print(f"Warning: Missing required environment variables: {', '.join(missing_vars)}")
         print("Please set these variables before running the server.")
 
-    # Start the server
+    # Start the server - Hugging Face Spaces typically use port 7860 or PORT environment variable
+    port = int(os.getenv("PORT", 7860))
     uvicorn.run(
-        "backend_todo_chatbot.main:app",
+        "main:app",
         host="0.0.0.0",
-        port=int(os.getenv("PORT", 8000)),
+        port=port,
         reload=os.getenv("RELOAD", "false").lower() == "true",
         log_level=os.getenv("LOG_LEVEL", "info")
     )
