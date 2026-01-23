@@ -1,0 +1,212 @@
+/* Global styles for Todo AI Chatbot frontend */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #fafafa;
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+.home-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  background-color: white;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.page-header p {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dashboard-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.dashboard-content h2 {
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+.dashboard-content p {
+  margin-bottom: 32px;
+  color: #6b7280;
+}
+
+.bot-icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.bot-icon-container:hover {
+  transform: scale(1.05);
+}
+
+.bot-icon {
+  width: 100px;
+  height: 100px;
+  background-color: #4f46e5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bot-icon-svg {
+  width: 60px;
+  height: 60px;
+  fill: white;
+}
+
+.chat-interface {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  background-color: white;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.back-button:hover {
+  background-color: #f3f4f6;
+}
+
+.chat-header h1 {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.chat-header p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.page-main {
+  flex: 1;
+  overflow: hidden;
+}
+
+.page-footer {
+  background-color: white;
+  padding: 12px;
+  text-align: center;
+  border-top: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: #6b7280;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .chat-header h1, .chat-header p {
+    font-size: 1.1rem;
+  }
+
+  .bot-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .bot-icon-svg {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a5b4fc;
+}

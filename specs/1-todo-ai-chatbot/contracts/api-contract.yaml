@@ -1,0 +1,253 @@
+# Todo AI Chatbot - API Contracts
+
+## Chat Endpoint Contract
+
+### POST /api/{user_id}/chat
+
+#### Description
+Processes a natural language message from a user and returns an AI-generated response along with any executed tool calls.
+
+#### Authentication
+JWT Bearer token in Authorization header, validated against Better Auth
+
+#### Parameters
+- **Path Parameter**:
+  - `user_id` (integer): The ID of the authenticated user (derived from JWT, validated for security)
+
+#### Request Body
+```json
+{
+  "conversation_id": 123,
+  "message": "Add a new task to buy groceries"
+}
+```
+
+#### Request Schema
+```yaml
+type: object
+properties:
+  conversation_id:
+    type: integer
+    description: Optional conversation ID; if null, starts a new conversation
+    nullable: true
+  message:
+    type: string
+    description: The user's natural language message
+    minLength: 1
+    maxLength: 1000
+required:
+  - message
+```
+
+#### Response Body
+```json
+{
+  "conversation_id": 123,
+  "response": "I've added the task 'buy groceries' to your list.",
+  "tool_calls": [
+    {
+      "name": "add_task",
+      "arguments": {"title": "buy groceries"},
+      "result": {"task_id": 456}
+    }
+  ]
+}
+```
+
+#### Response Schema
+```yaml
+type: object
+properties:
+  conversation_id:
+    type: integer
+    description: The ID of the conversation (newly created if not provided)
+  response:
+    type: string
+    description: The AI-generated response to the user
+  tool_calls:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the MCP tool that was called
+        arguments:
+          type: object
+          description: The arguments passed to the tool
+        result:
+          type: object
+          description: The result returned by the tool
+```
+
+#### HTTP Status Codes
+- `200`: Success - message processed and response generated
+- `400`: Bad Request - invalid request format
+- `401`: Unauthorized - invalid or missing JWT token
+- `403`: Forbidden - user_id in path doesn't match JWT user_id
+- `429`: Too Many Requests - rate limit exceeded
+- `500`: Internal Server Error - unexpected error occurred
+
+#### Error Response Format
+```json
+{
+  "error": "Descriptive error message",
+  "code": "ERROR_CODE",
+  "details": {}
+}
+```
+
+## MCP Tool Contracts
+
+### add_task(user_id, title, description?)
+
+#### Description
+Creates a new task for the specified user.
+
+#### Parameters
+- `user_id` (integer): The ID of the user who owns the task
+- `title` (string): The title of the task
+- `description` (string, optional): Detailed description of the task
+
+#### Returns
+```json
+{
+  "task_id": 456,
+  "title": "buy groceries",
+  "description": "Get milk, bread, and eggs",
+  "completed": false
+}
+```
+
+#### Validation
+- user_id must match an existing user
+- title must be 1-255 characters
+- user can only create tasks for themselves
+
+### list_tasks(user_id, status?)
+
+#### Description
+Retrieves tasks for the specified user with optional status filter.
+
+#### Parameters
+- `user_id` (integer): The ID of the user whose tasks to retrieve
+- `status` (string, optional): Filter tasks by status ("all", "active", "completed"); defaults to "all"
+
+#### Returns
+```json
+{
+  "tasks": [
+    {
+      "task_id": 123,
+      "title": "buy groceries",
+      "completed": false
+    },
+    {
+      "task_id": 456,
+      "title": "finish report",
+      "completed": true
+    }
+  ]
+}
+```
+
+#### Validation
+- user_id must match an existing user
+- user can only retrieve their own tasks
+- status must be "all", "active", or "completed" if provided
+
+### complete_task(user_id, task_id)
+
+#### Description
+Marks a user's task as completed.
+
+#### Parameters
+- `user_id` (integer): The ID of the user who owns the task
+- `task_id` (integer): The ID of the task to mark as completed
+
+#### Returns
+```json
+{
+  "task_id": 123,
+  "completed": true,
+  "title": "buy groceries"
+}
+```
+
+#### Validation
+- user_id must match an existing user
+- task_id must exist and belong to the user
+- user can only complete their own tasks
+
+### delete_task(user_id, task_id)
+
+#### Description
+Deletes a user's task.
+
+#### Parameters
+- `user_id` (integer): The ID of the user who owns the task
+- `task_id` (integer): The ID of the task to delete
+
+#### Returns
+```json
+{
+  "task_id": 123,
+  "deleted": true
+}
+```
+
+#### Validation
+- user_id must match an existing user
+- task_id must exist and belong to the user
+- user can only delete their own tasks
+
+### update_task(user_id, task_id, title?, description?)
+
+#### Description
+Updates a user's task details.
+
+#### Parameters
+- `user_id` (integer): The ID of the user who owns the task
+- `task_id` (integer): The ID of the task to update
+- `title` (string, optional): New title for the task
+- `description` (string, optional): New description for the task
+
+#### Returns
+```json
+{
+  "task_id": 123,
+  "title": "buy groceries and household items",
+  "description": "Get milk, bread, eggs, and cleaning supplies",
+  "updated": true
+}
+```
+
+#### Validation
+- user_id must match an existing user
+- task_id must exist and belong to the user
+- user can only update their own tasks
+- title must be 1-255 characters if provided
+
+## Authentication Endpoint Contract
+
+### GET /api/user/validate-jwt
+
+#### Description
+Validates a JWT token and returns user information.
+
+#### Authentication
+JWT Bearer token in Authorization header
+
+#### Response
+```json
+{
+  "user_id": 123,
+  "valid": true,
+  "expires_at": "2023-12-31T23:59:59Z"
+}
+```
+
+#### HTTP Status Codes
+- `200`: Valid token
+- `401`: Invalid or expired token
+- `500`: Internal server error

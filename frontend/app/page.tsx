@@ -10,6 +10,8 @@ import TaskForm from '../components/TaskForm';
 import Filters from '../components/Filters';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import ChatbotIcon from '../components/ChatbotIcon';
+import ChatInterface from '../components/ChatInterface';
 
 interface FilterOptions {
   status: 'all' | 'pending' | 'completed';
@@ -25,6 +27,7 @@ export default function HomePage() {
   const [tasksLoading, setTasksLoading] = useState(true);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [showChatInterface, setShowChatInterface] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     status: 'all',
     sortBy: 'created_at',
@@ -305,6 +308,15 @@ export default function HomePage() {
           onSuccess={editingTask ? handleTaskUpdated : handleTaskCreated}
         />
       )}
+
+      {/* Chatbot Interface */}
+      <ChatInterface
+        isOpen={showChatInterface}
+        onClose={() => setShowChatInterface(false)}
+      />
+
+      {/* Chatbot Icon - Only show for authenticated users */}
+      <ChatbotIcon onClick={() => setShowChatInterface(true)} />
 
       <Footer />
     </div>
