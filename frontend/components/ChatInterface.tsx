@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../providers/AuthProvider';
+import { chatApi } from '../lib/api';
 
 interface Message {
   id: string;
@@ -61,27 +62,15 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
         message: inputValue
       };
 
-      // Call the backend API
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${user.id}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}` // Assuming token is stored in localStorage
-        },
-        body: JSON.stringify(requestBody)
-      });
+      // Call the backend API using the dedicated chat API client
+      const response = await chatApi.post<any>(`/api/${user.id}/chat`, requestBody);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
+      // The backend returns a direct ChatResponse object, not wrapped in ApiResponse
       // Add assistant response to the chat
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.response || 'I processed your request.',
+        content: response.data.response || 'I processed your request.',
         timestamp: new Date(),
       };
 
