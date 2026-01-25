@@ -1,3 +1,16 @@
+---
+title: Todo AI Chatbot
+emoji: ✅
+colorFrom: blue
+colorTo: green
+sdk: docker
+python_version: "3.11"
+app_file: app.py
+pinned: false
+---
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+
 # Todo AI Chatbot Backend
 
 This is the backend component for the Todo AI Chatbot application. It provides a REST API that allows users to manage their tasks through natural language commands using AI-powered processing.

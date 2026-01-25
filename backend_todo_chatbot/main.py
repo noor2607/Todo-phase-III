@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, Dict, Any, List
 import os
 import jwt
@@ -21,20 +20,6 @@ load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI(title="Todo AI Chatbot API", version="1.0.0")
-
-# Add CORS middleware to allow requests from the deployed frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://todo-phase-iii.vercel.app",  # Deployed frontend
-        "http://localhost:3000",              # Local development
-        "http://localhost:3001",              # Alternative local port
-        "http://localhost:8000",              # Backend local server
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Security scheme
 security = HTTPBearer()
@@ -171,6 +156,18 @@ def chat_endpoint(
         response=ai_response,
         tool_calls=tool_calls
     )
+
+
+@app.get("/")
+def root():
+    """Root endpoint for Hugging Face Spaces."""
+    return {
+        "message": "Todo AI Chatbot API",
+        "version": "1.0.0",
+        "status": "running",
+        "docs": "/docs",
+        "health": "/health"
+    }
 
 
 @app.get("/health")

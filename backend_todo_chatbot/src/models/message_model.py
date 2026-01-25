@@ -9,8 +9,6 @@ class MessageBase(SQLModel):
 
 
 class Message(MessageBase, table=True):
-    __tablename__ = "messages"
-
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(index=True)
     conversation_id: int = Field(index=True)

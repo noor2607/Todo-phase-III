@@ -9,9 +9,12 @@ load_dotenv()
 class TodoAgent:
     def __init__(self):
         """Initialize the Todo AI Agent with Cohere as the model provider."""
+        # Validate API key exists
+        if not os.getenv("COHERE_API_KEY"):
+            raise ValueError("COHERE_API_KEY environment variable is required")
+
         # Note: In a real implementation, we would integrate with Cohere's API
         # For now, we'll create a mock implementation that simulates the agent behavior
-        # We don't require COHERE_API_KEY since we're using a mock implementation
         self.tools = {
             "add_task": self._mock_add_task,
             "list_tasks": self._mock_list_tasks,

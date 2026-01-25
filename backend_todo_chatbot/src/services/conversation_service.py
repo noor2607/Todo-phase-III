@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from typing import List, Optional
-from ..models import Conversation, ConversationCreate
+from src.models import Conversation, ConversationCreate
 
 
 class ConversationService:

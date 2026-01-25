@@ -1,6 +1,6 @@
-from sqlmodel import create_engine, Session
+from sqlmodel import create_engine, Session, SQLModel
 from sqlalchemy.orm import sessionmaker
-from .models import *
+from src.models import *
 import os
 from typing import Generator
 
