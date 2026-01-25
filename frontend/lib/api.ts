@@ -221,3 +221,6 @@ export const chatApi = {
     return chatApiClient.post<ApiResponse<T>>(url, data, config);
   },
 };
+
+// Export the chat API client directly for use in components that need raw responses
+export { chatApiClient };

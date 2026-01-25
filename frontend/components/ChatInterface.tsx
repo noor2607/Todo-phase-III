@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../providers/AuthProvider';
-import { chatApi } from '../lib/api';
+import axios from 'axios';
 
 interface Message {
   id: string;
@@ -62,10 +62,19 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
         message: inputValue
       };
 
-      // Call the backend API using the dedicated chat API client
-      const response = await chatApi.post<any>(`/api/${user.id}/chat`, requestBody);
+      // Call the backend API using axios directly for the chat endpoint
+      // The chat endpoint returns a direct ChatResponse object, not wrapped in ApiResponse
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${user.id}/chat`,
+        requestBody,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+          }
+        }
+      );
 
-      // The backend returns a direct ChatResponse object, not wrapped in ApiResponse
       // Add assistant response to the chat
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
