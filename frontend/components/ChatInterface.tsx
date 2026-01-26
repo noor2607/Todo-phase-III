@@ -70,7 +70,7 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
 
       // Call the backend API using the chat API client (which now points to main backend)
       // The chat endpoint returns a direct ChatResponse object
-      const response = await chatApi.post(`/chat`, requestBody);
+      const response = await chatApi.post(`/api/chat`, requestBody);
 
       // Safely extract the response content with type assertion and checking
       const responseData = response.data as ApiResponse;
