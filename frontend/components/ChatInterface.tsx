@@ -20,7 +20,7 @@ interface ChatInterfaceProps {
 interface ApiResponse {
   data?: {
     response: string;
-  };
+  } | unknown;
 }
 
 const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
@@ -72,9 +72,12 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
       // The chat endpoint returns a direct ChatResponse object
       const response = await chatApi.post(`/chat`, requestBody);
 
-      // Safely extract the response content with type checking
-      const responseData: ApiResponse = response.data;
-      const assistantResponse = responseData.data?.response || 'I processed your request.';
+      // Safely extract the response content with type assertion and checking
+      const responseData = response.data as ApiResponse;
+      const assistantResponse =
+        responseData.data && typeof responseData.data === 'object' && 'response' in responseData.data
+          ? (responseData.data as { response: string }).response
+          : 'I processed your request.';
 
       // Add assistant response to the chat
       const assistantMessage: Message = {
