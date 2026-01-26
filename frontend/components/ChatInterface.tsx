@@ -17,6 +17,12 @@ interface ChatInterfaceProps {
   onClose: () => void;
 }
 
+interface ApiResponse {
+  data?: {
+    response: string;
+  };
+}
+
 const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
@@ -67,10 +73,8 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
       const response = await chatApi.post(`/chat`, requestBody);
 
       // Safely extract the response content with type checking
-      const responseData = response.data;
-      const assistantResponse = typeof responseData === 'object' && responseData.data && typeof responseData.data.response === 'string'
-        ? responseData.data.response
-        : 'I processed your request.';
+      const responseData: ApiResponse = response.data;
+      const assistantResponse = responseData.data?.response || 'I processed your request.';
 
       // Add assistant response to the chat
       const assistantMessage: Message = {
