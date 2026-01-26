@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     better_auth_url: str = os.getenv("BETTER_AUTH_URL", "http://localhost:3000")
 
     # CORS Configuration
-    allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001")
+    allowed_origins: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,https://todo-phase-iii.vercel.app,https://www.todo-phase-iii.vercel.app")
 
 
 # Create a single instance of settings
