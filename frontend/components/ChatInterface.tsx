@@ -80,7 +80,7 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
 
       // Extract the response content from the ChatResponse object
       // The backend returns { conversation_id, response, tool_calls }
-      const chatResponse = response.data as ChatResponse;
+      const chatResponse = response.data as unknown as ChatResponse;
       const assistantResponse = chatResponse?.response || 'I processed your request.';
 
       // Add assistant response to the chat
