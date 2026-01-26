@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../providers/AuthProvider';
-import axios from 'axios';
+import { chatApi } from '../lib/api'; // Use the chat API client that points to main backend
 
 interface Message {
   id: string;
@@ -62,36 +62,66 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
         message: inputValue
       };
 
-      // Call the backend API using axios directly for the chat endpoint
-      // The chat endpoint returns a direct ChatResponse object, not wrapped in ApiResponse
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${user.id}/chat`,
-        requestBody,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-          }
-        }
-      );
+      // Call the backend API using the chat API client (which now points to main backend)
+      // The chat endpoint returns a direct ChatResponse object
+      const response = await chatApi.post(`/chat`, requestBody);
 
       // Add assistant response to the chat
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.data.response || 'I processed your request.',
+        content: response.data.data.response || 'I processed your request.',
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
+
+      let errorMessageText = 'Sorry, I encountered an issue processing your request. Please try again.';
+
+      // Handle different types of errors
+      if (error.response) {
+        // Server responded with error status
+        const status = error.response.status;
+        switch (status) {
+          case 401:
+            errorMessageText = 'Authentication failed. Please log in again.';
+            // Redirect to login
+            setTimeout(() => {
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('user');
+              window.location.href = '/signin';
+            }, 2000);
+            break;
+          case 403:
+            errorMessageText = 'Access denied. You can only access your own data.';
+            break;
+          case 404:
+            errorMessageText = 'The requested resource was not found.';
+            break;
+          case 422:
+            errorMessageText = 'Invalid request format. Please check your input.';
+            break;
+          case 500:
+            errorMessageText = 'Server error. The AI service may be temporarily unavailable.';
+            break;
+          default:
+            errorMessageText = `Server error (${status}). Please try again later.`;
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessageText = 'Network error. Please check your connection and try again.';
+      } else {
+        // Something else happened
+        errorMessageText = 'An unexpected error occurred. Please try again.';
+      }
 
       // Add error message to the chat
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an issue processing your request. Please try again.',
+        content: errorMessageText,
         timestamp: new Date(),
         isError: true
       };
