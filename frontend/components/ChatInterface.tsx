@@ -72,12 +72,10 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
       // The chat endpoint returns a direct ChatResponse object
       const response = await chatApi.post(`/api/chat`, requestBody);
 
-      // Safely extract the response content with type assertion and checking
-      const responseData = response.data as ApiResponse;
-      const assistantResponse =
-        responseData.data && typeof responseData.data === 'object' && 'response' in responseData.data
-          ? (responseData.data as { response: string }).response
-          : 'I processed your request.';
+      // Extract the response content from the ChatResponse object
+      // The backend returns { conversation_id, response, tool_calls }
+      const chatResponse = response.data;
+      const assistantResponse = chatResponse?.response || 'I processed your request.';
 
       // Add assistant response to the chat
       const assistantMessage: Message = {
