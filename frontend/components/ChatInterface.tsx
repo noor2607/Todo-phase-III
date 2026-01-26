@@ -23,6 +23,12 @@ interface ApiResponse {
   } | unknown;
 }
 
+interface ChatResponse {
+  conversation_id: number;
+  response: string;
+  tool_calls: any[];
+}
+
 const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
@@ -74,7 +80,7 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
 
       // Extract the response content from the ChatResponse object
       // The backend returns { conversation_id, response, tool_calls }
-      const chatResponse = response.data;
+      const chatResponse = response.data as ChatResponse;
       const assistantResponse = chatResponse?.response || 'I processed your request.';
 
       // Add assistant response to the chat
