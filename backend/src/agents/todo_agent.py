@@ -1,8 +1,8 @@
 import os
 from typing import Dict, Any
 from dotenv import load_dotenv
-from services.task_service import TaskService
-from database.models.task import Task, TaskCreate
+from services.task_service import create_task, get_user_tasks, update_task_completion, delete_task_by_id
+from database.models.task import Task
 from sqlmodel import Session
 
 # Load environment variables
@@ -32,14 +32,15 @@ class TodoAgent:
         """Real implementation of add_task tool."""
         try:
             # Create the task using the task service
-            task_create = TaskCreate(
-                title=title,
-                description=description or "",
-                completed=False
-            )
+            task_data = {
+                "title": title,
+                "description": description or "",
+                "completed": False,
+                "user_id": str(user_id)  # Convert to string to match expected format
+            }
 
-            # Create task in the database using TaskService
-            task = TaskService.create_task(session=db_session, task_create=task_create, user_id=str(user_id))
+            # Create task in the database using standalone function
+            task = create_task(db_session, task_data)
 
             return {
                 "task_id": task.id,
@@ -57,8 +58,15 @@ class TodoAgent:
     def _list_tasks(self, db_session: Session, user_id: int, status: str = None) -> Dict[str, Any]:
         """Real implementation of list_tasks tool."""
         try:
-            # Get tasks for the user using TaskService
-            tasks = TaskService.get_tasks_for_user(session=db_session, user_id=str(user_id), status_filter=status)
+            # Get tasks for the user using standalone function
+            tasks = get_user_tasks(db_session, user_id)
+
+            # Filter by status if specified
+            if status:
+                if status.lower() == 'completed':
+                    tasks = [task for task in tasks if task.completed]
+                elif status.lower() == 'pending':
+                    tasks = [task for task in tasks if not task.completed]
 
             return {
                 "tasks": [
@@ -81,16 +89,25 @@ class TodoAgent:
     def _complete_task(self, db_session: Session, user_id: int, task_id: int) -> Dict[str, Any]:
         """Real implementation of complete_task tool."""
         try:
-            # Update task completion status using TaskService
-            result = TaskService.toggle_task_completion(session=db_session, task_id=task_id, user_id=str(user_id))
+            # Update task completion status using standalone function
+            success = update_task_completion(db_session, task_id, True)
 
-            if result:
-                return {
-                    "task_id": result.id,
-                    "completed": result.completed,
-                    "title": result.title,
-                    "success": True
-                }
+            if success:
+                # Get the updated task to return details
+                from sqlmodel import select
+                task = db_session.exec(select(Task).where(Task.id == task_id)).first()
+                if task:
+                    return {
+                        "task_id": task.id,
+                        "completed": task.completed,
+                        "title": task.title,
+                        "success": True
+                    }
+                else:
+                    return {
+                        "error": "Task not found after update",
+                        "success": False
+                    }
             else:
                 return {
                     "error": "Task not found or not owned by user",
@@ -105,8 +122,8 @@ class TodoAgent:
     def _delete_task(self, db_session: Session, user_id: int, task_id: int) -> Dict[str, Any]:
         """Real implementation of delete_task tool."""
         try:
-            # Delete the task using TaskService
-            success = TaskService.delete_task(session=db_session, task_id=task_id, user_id=str(user_id))
+            # Delete the task using standalone function
+            success = delete_task_by_id(db_session, task_id)
 
             if success:
                 return {
@@ -128,32 +145,33 @@ class TodoAgent:
     def _update_task(self, db_session: Session, user_id: int, task_id: int, title: str = None, description: str = None) -> Dict[str, Any]:
         """Real implementation of update_task tool."""
         try:
-            # Create update data
-            from database.models.task import TaskUpdate
-            task_update_data = {}
-            if title is not None:
-                task_update_data["title"] = title
-            if description is not None:
-                task_update_data["description"] = description
+            # Get the existing task
+            from sqlmodel import select
+            task = db_session.exec(select(Task).where(Task.id == task_id)).first()
 
-            task_update = TaskUpdate(**task_update_data)
-
-            # Update the task using TaskService
-            result = TaskService.update_task(session=db_session, task_id=task_id, task_update=task_update, user_id=str(user_id))
-
-            if result:
-                return {
-                    "task_id": result.id,
-                    "title": result.title,
-                    "description": result.description,
-                    "updated": True,
-                    "success": True
-                }
-            else:
+            if not task:
                 return {
                     "error": "Task not found or not owned by user",
                     "success": False
                 }
+
+            # Update the task fields if provided
+            if title is not None:
+                task.title = title
+            if description is not None:
+                task.description = description
+
+            db_session.add(task)
+            db_session.commit()
+            db_session.refresh(task)
+
+            return {
+                "task_id": task.id,
+                "title": task.title,
+                "description": task.description,
+                "updated": True,
+                "success": True
+            }
         except Exception as e:
             return {
                 "error": str(e),
