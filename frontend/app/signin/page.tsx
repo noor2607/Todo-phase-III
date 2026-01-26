@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../providers/AuthProvider';
@@ -14,6 +14,16 @@ const SigninPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Check for signup success message on component mount
+  useEffect(() => {
+    const signupSuccess = sessionStorage.getItem('signupSuccess');
+    if (signupSuccess) {
+      setSuccessMessage(signupSuccess);
+      sessionStorage.removeItem('signupSuccess'); // Remove after showing
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -84,6 +94,11 @@ const SigninPage = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {successMessage && (
+            <div className="mb-4 bg-green-50 text-green-700 p-3 rounded-md">
+              {successMessage}
+            </div>
+          )}
           {error && (
             <div className="mb-4 bg-red-50 text-red-700 p-3 rounded-md">
               {error}

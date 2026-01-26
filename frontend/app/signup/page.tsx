@@ -98,11 +98,12 @@ const SignupPage = () => {
           localStorage.setItem('authToken', token);
         }
 
-        // Login the user with the returned data
-        login(user || { id: 'mock-user-id', email: formData.email, first_name: formData.firstName, last_name: formData.lastName });
+        // Show success message and redirect to sign in page
+        // For better UX, we'll store a success message to show on the sign in page
+        sessionStorage.setItem('signupSuccess', 'Account created successfully! Please sign in to continue.');
 
-        // Redirect to tasks dashboard after successful registration
-        router.push('/tasks');
+        // Redirect to sign in page after successful registration
+        router.push('/signin');
       } else {
         // Try to get more specific error message
         const errorMessage = result.error || result.message || result.detail || 'Failed to create account';

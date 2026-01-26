@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -m pytest tests/auth/ -v)"
+      "Bash(python -m pytest tests/auth/ -v)",
+      "Bash(uvicorn src.main:app --reload --port 8000)"
     ]
   }
 }
