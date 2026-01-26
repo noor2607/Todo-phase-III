@@ -5,14 +5,20 @@ from database.engine import get_session
 from auth.dependencies import get_current_user
 from pydantic import BaseModel
 
-# Import the TodoAgent from the chatbot backend
+# Import the TodoAgent from the local agents directory
 import sys
 import os
-# Add the backend_todo_chatbot src directory to the Python path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'backend_todo_chatbot', 'src'))
 
-# Import the TodoAgent
-from agents.todo_agent import TodoAgent
+# Add the src directory to the Python path so we can import from agents
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.dirname(current_dir)
+agents_dir = os.path.join(src_dir, 'agents')
+
+# Add to path if not already there
+if agents_dir not in sys.path:
+    sys.path.insert(0, agents_dir)
+
+from todo_agent import TodoAgent
 
 router = APIRouter()
 
