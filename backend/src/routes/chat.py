@@ -66,7 +66,7 @@ def chat_endpoint(
     try:
         # Initialize and run AI agent
         agent = TodoAgent()
-        agent_result = agent.run_agent(request.message, user_id)
+        agent_result = agent.run_agent(request.message, user_id, session)
 
         ai_response = agent_result.get("response", "I processed your request.")
         tool_calls = agent_result.get("tool_calls", [])
