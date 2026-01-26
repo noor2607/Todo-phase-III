@@ -11,7 +11,7 @@ const mainApiClient: AxiosInstance = axios.create({
 
 // Create API client for chatbot backend (AI chat functionality)
 const chatApiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
   timeout: 15000, // Slightly longer timeout for AI processing
   headers: {
     'Content-Type': 'application/json',
