@@ -103,17 +103,21 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Check if the response contains task-related tool calls
+      // Check if the response contains task creation tool calls
       // and trigger the callback if provided
       if (onTaskAction && Array.isArray(toolCalls) && toolCalls.length > 0) {
-        const hasTaskRelatedToolCall = toolCalls.some(toolCall =>
+        const hasTaskCreationCall = toolCalls.some(toolCall =>
           toolCall.name &&
-          (toolCall.name.includes('task') ||
-           ['add_task', 'complete_task', 'delete_task', 'update_task'].includes(toolCall.name))
+          (toolCall.name === 'add_task' ||
+           toolCall.name.includes('add_task') ||
+           toolCall.result?.success === true)
         );
 
-        if (hasTaskRelatedToolCall) {
-          onTaskAction();
+        if (hasTaskCreationCall) {
+          // Small delay to ensure the task is persisted in the database
+          setTimeout(() => {
+            onTaskAction();
+          }, 500);
         }
       }
     } catch (error: any) {
