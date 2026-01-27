@@ -57,11 +57,8 @@ def chat_endpoint(
     Returns:
         ChatResponse with conversation_id, response, and tool_calls
     """
-    # Convert user ID to integer for compatibility with existing agent code
-    try:
-        user_id = int(current_user_id) if current_user_id.isdigit() else hash(current_user_id) % 10000  # Use hash to generate a numeric ID
-    except:
-        user_id = 1  # Fallback to 1 if conversion fails
+    # Use the original user ID string to maintain consistency with task retrieval
+    user_id = current_user_id
 
     try:
         # Initialize and run AI agent

@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from database.models.task import Task, TaskCreate, TaskUpdate, TaskRead
 from utils.validators import validate_title_length
 from fastapi import HTTPException, status
@@ -24,7 +24,7 @@ def create_task(db_session: Session, task_data: Dict[str, Any]) -> Task:
     return task
 
 
-def get_user_tasks(db_session: Session, user_id: int) -> List[Task]:
+def get_user_tasks(db_session: Session, user_id: Union[str, int]) -> List[Task]:
     """Get all tasks for a user"""
     statement = select(Task).where(Task.user_id == str(user_id))
     return list(db_session.exec(statement).all())
