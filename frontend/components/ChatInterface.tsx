@@ -71,20 +71,27 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
       };
 
       // Call the backend API using the chat API client (which now points to main backend)
-      // The chat endpoint returns a ChatResponse object wrapped in ApiResponse
       const response = await chatApi.post(`/api/chat`, requestBody);
 
-      // Extract the response content from the ChatResponse object
-      // The backend returns ApiResponse<{ conversation_id, response, tool_calls }>
-      const apiResponse = response.data as ApiResponse<ChatResponse>;
-      const chatResponse = apiResponse.data;
+      // Handle different possible response structures from the backend
+      let chatResponse;
+
+      // Check if response follows ApiResponse<ChatResponse> structure
+      if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+        // It's wrapped in ApiResponse
+        chatResponse = (response.data as any).data;
+      } else {
+        // Direct ChatResponse structure
+        chatResponse = response.data;
+      }
 
       if (!chatResponse) {
         throw new Error('Invalid response from chat API');
       }
 
-      const assistantResponse = chatResponse.response || 'I processed your request.';
-      const toolCalls = chatResponse.tool_calls || [];
+      // Ensure we have the expected properties
+      const assistantResponse = chatResponse.response || chatResponse.data?.response || 'I processed your request.';
+      const toolCalls = chatResponse.tool_calls || chatResponse.data?.tool_calls || [];
 
       // Add assistant response to the chat
       const assistantMessage: Message = {
