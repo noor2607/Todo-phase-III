@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../providers/AuthProvider';
-import { chatApi } from '../lib/api'; // Use the chat API client that points to main backend
+import { chatApi, ApiResponse } from '../lib/api'; // Use the chat API client that points to main backend
 
 interface Message {
   id: string;
@@ -18,11 +18,6 @@ interface ChatInterfaceProps {
   onTaskAction?: () => void; // Callback to trigger task refresh after AI operations
 }
 
-interface ApiResponse {
-  data?: {
-    response: string;
-  } | unknown;
-}
 
 interface ChatResponse {
   conversation_id: number;
@@ -76,14 +71,20 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
       };
 
       // Call the backend API using the chat API client (which now points to main backend)
-      // The chat endpoint returns a direct ChatResponse object
+      // The chat endpoint returns a ChatResponse object wrapped in ApiResponse
       const response = await chatApi.post(`/api/chat`, requestBody);
 
       // Extract the response content from the ChatResponse object
-      // The backend returns { conversation_id, response, tool_calls }
-      const chatResponse = response.data as unknown as ChatResponse;
-      const assistantResponse = chatResponse?.response || 'I processed your request.';
-      const toolCalls = chatResponse?.tool_calls || [];
+      // The backend returns ApiResponse<{ conversation_id, response, tool_calls }>
+      const apiResponse = response.data as ApiResponse<ChatResponse>;
+      const chatResponse = apiResponse.data;
+
+      if (!chatResponse) {
+        throw new Error('Invalid response from chat API');
+      }
+
+      const assistantResponse = chatResponse.response || 'I processed your request.';
+      const toolCalls = chatResponse.tool_calls || [];
 
       // Add assistant response to the chat
       const assistantMessage: Message = {
