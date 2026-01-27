@@ -30,7 +30,7 @@ interface ChatResponse {
   tool_calls: any[];
 }
 
-const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
+const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
