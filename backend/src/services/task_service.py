@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from database.models.task import Task, TaskCreate, TaskUpdate, TaskRead
 from utils.validators import validate_title_length
 from fastapi import HTTPException, status
@@ -7,6 +7,50 @@ from datetime import datetime
 from utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+# Standalone functions for TodoAgent compatibility
+def create_task(db_session: Session, task_data: Dict[str, Any]) -> Task:
+    """Create a new task from dictionary data"""
+    task = Task(
+        title=task_data.get("title", ""),
+        description=task_data.get("description", ""),
+        completed=task_data.get("completed", False),
+        user_id=str(task_data.get("user_id", ""))
+    )
+    db_session.add(task)
+    db_session.commit()
+    db_session.refresh(task)
+    return task
+
+
+def get_user_tasks(db_session: Session, user_id: int) -> List[Task]:
+    """Get all tasks for a user"""
+    statement = select(Task).where(Task.user_id == str(user_id))
+    return list(db_session.exec(statement).all())
+
+
+def update_task_completion(db_session: Session, task_id: int, completed: bool) -> bool:
+    """Update task completion status"""
+    statement = select(Task).where(Task.id == task_id)
+    task = db_session.exec(statement).first()
+    if task:
+        task.completed = completed
+        db_session.add(task)
+        db_session.commit()
+        return True
+    return False
+
+
+def delete_task_by_id(db_session: Session, task_id: int) -> bool:
+    """Delete a task by ID"""
+    statement = select(Task).where(Task.id == task_id)
+    task = db_session.exec(statement).first()
+    if task:
+        db_session.delete(task)
+        db_session.commit()
+        return True
+    return False
 
 
 class TaskService:

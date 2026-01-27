@@ -6,8 +6,10 @@ def setup_logging():
     """
     Set up logging configuration based on settings
     """
+    # Strip whitespace and newlines from log level
+    log_level = settings.log_level.strip().upper()
     logging.basicConfig(
-        level=getattr(logging, settings.log_level.upper()),
+        level=getattr(logging, log_level, logging.INFO),
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.StreamHandler(),

@@ -15,6 +15,7 @@ interface Message {
 interface ChatInterfaceProps {
   isOpen: boolean;
   onClose: () => void;
+  onTaskAction?: () => void; // Callback to trigger task refresh after AI operations
 }
 
 interface ApiResponse {
@@ -82,6 +83,7 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
       // The backend returns { conversation_id, response, tool_calls }
       const chatResponse = response.data as unknown as ChatResponse;
       const assistantResponse = chatResponse?.response || 'I processed your request.';
+      const toolCalls = chatResponse?.tool_calls || [];
 
       // Add assistant response to the chat
       const assistantMessage: Message = {
@@ -92,6 +94,20 @@ const ChatInterface = ({ isOpen, onClose }: ChatInterfaceProps) => {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Check if the response contains task-related tool calls
+      // and trigger the callback if provided
+      if (onTaskAction && Array.isArray(toolCalls) && toolCalls.length > 0) {
+        const hasTaskRelatedToolCall = toolCalls.some(toolCall =>
+          toolCall.name &&
+          (toolCall.name.includes('task') ||
+           ['add_task', 'complete_task', 'delete_task', 'update_task'].includes(toolCall.name))
+        );
+
+        if (hasTaskRelatedToolCall) {
+          onTaskAction();
+        }
+      }
     } catch (error: any) {
       console.error('Error sending message:', error);
 

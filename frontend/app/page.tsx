@@ -313,6 +313,7 @@ export default function HomePage() {
       <ChatInterface
         isOpen={showChatInterface}
         onClose={() => setShowChatInterface(false)}
+        onTaskAction={loadTasks} // Refresh tasks after AI operations
       />
 
       {/* Chatbot Icon - Only show for authenticated users */}
