@@ -1,8 +1,9 @@
 import os
+import re
 from typing import Dict, Any
 from dotenv import load_dotenv
-from services.task_service import create_task, get_user_tasks, update_task_completion, delete_task_by_id
-from database.models.task import Task
+from ..services.task_service import create_task, get_user_tasks, update_task_completion, delete_task_by_id
+from ..database.models.task import Task
 from sqlmodel import Session
 
 # Load environment variables
@@ -279,24 +280,38 @@ class TodoAgent:
                 response = f"I encountered an error listing tasks: {tool_result.get('error', 'Unknown error')}"
 
         elif "complete" in user_message_lower or "done" in user_message_lower or "finish" in user_message_lower:
-            # For complete task, we'd need to extract the specific task ID from the message
-            # For now, we'll use a simple approach to find a task to complete
+            # Extract potential task identifier from the message
+            import re
+            # Look for numbered tasks (e.g., "complete task 3", "mark task #2 as done", etc.)
+            task_num_match = re.search(r'(?:task|#)\s*(\d+)', user_message_lower)
+
             if db_session:
-                # Get user's tasks to find one to complete
+                # Get user's tasks
                 user_id_str = str(user_id)
                 tasks = get_user_tasks(db_session, user_id_str)
+
                 if tasks:
-                    # Find a pending task to complete (just taking the first one for demo)
-                    pending_task = next((t for t in tasks if not t.completed), None)
-                    if pending_task:
-                        tool_result = self._complete_task(db_session, user_id, pending_task.id)
+                    task_to_complete = None
+
+                    if task_num_match:
+                        # User specified a task number
+                        task_num = int(task_num_match.group(1))
+                        # Find task by position (1-indexed)
+                        if 1 <= task_num <= len(tasks):
+                            task_to_complete = tasks[task_num - 1]
+                    else:
+                        # Find a pending task to complete (just taking the first one if none specified)
+                        task_to_complete = next((t for t in tasks if not t.completed), None)
+
+                    if task_to_complete:
+                        tool_result = self._complete_task(db_session, user_id, task_to_complete.id)
                         tool_name = "complete_task"
                         if tool_result.get("success"):
-                            response = f"I've marked the task '{pending_task.title}' as completed."
+                            response = f"I've marked the task '{task_to_complete.title}' as completed."
                         else:
                             response = f"I encountered an error completing the task: {tool_result.get('error', 'Unknown error')}"
                     else:
-                        response = "You don't have any pending tasks to complete."
+                        response = "Could not find a pending task to complete."
                         tool_result = {"error": "No pending tasks found", "success": False}
                         tool_name = "complete_task"
                 else:
@@ -305,58 +320,118 @@ class TodoAgent:
                     tool_name = "complete_task"
             else:
                 # Fallback to mock if no database session provided
-                tool_result = self._mock_complete_task(user_id, 123)
+                task_id = int(task_num_match.group(1)) if task_num_match else 123
+                tool_result = self._mock_complete_task(user_id, task_id)
                 tool_name = "complete_task"
                 response = f"I've marked a task as completed."
 
         elif "delete" in user_message_lower or "remove" in user_message_lower or "cancel" in user_message_lower:
-            # For delete task, we'd need to extract the specific task ID from the message
-            # For now, we'll use a simple approach to find a task to delete
+            # Extract potential task identifier from the message
+            import re
+            # Look for numbered tasks (e.g., "delete task 3", "remove task #2", etc.)
+            task_num_match = re.search(r'(?:task|#)\s*(\d+)', user_message_lower)
+
             if db_session:
-                # Get user's tasks to find one to delete
+                # Get user's tasks
                 user_id_str = str(user_id)
                 tasks = get_user_tasks(db_session, user_id_str)
+
                 if tasks:
-                    # Just take the first task to delete for demo
-                    task_to_delete = tasks[0]
-                    tool_result = self._delete_task(db_session, user_id, task_to_delete.id)
-                    tool_name = "delete_task"
-                    if tool_result.get("success"):
-                        response = f"I've removed the task '{task_to_delete.title}' from your list."
+                    task_to_delete = None
+
+                    if task_num_match:
+                        # User specified a task number
+                        task_num = int(task_num_match.group(1))
+                        # Find task by position (1-indexed)
+                        if 1 <= task_num <= len(tasks):
+                            task_to_delete = tasks[task_num - 1]
                     else:
-                        response = f"I encountered an error deleting the task: {tool_result.get('error', 'Unknown error')}"
+                        # Just take the first task if no specific one mentioned
+                        task_to_delete = tasks[0]
+
+                    if task_to_delete:
+                        tool_result = self._delete_task(db_session, user_id, task_to_delete.id)
+                        tool_name = "delete_task"
+                        if tool_result.get("success"):
+                            response = f"I've removed the task '{task_to_delete.title}' from your list."
+                        else:
+                            response = f"I encountered an error deleting the task: {tool_result.get('error', 'Unknown error')}"
+                    else:
+                        response = "Could not find the specified task to delete."
+                        tool_result = {"error": "Task not found", "success": False}
+                        tool_name = "delete_task"
                 else:
                     response = "You don't have any tasks to delete."
                     tool_result = {"error": "No tasks found", "success": False}
                     tool_name = "delete_task"
             else:
                 # Fallback to mock if no database session provided
-                tool_result = self._mock_delete_task(user_id, 123)
+                task_id = int(task_num_match.group(1)) if task_num_match else 123
+                tool_result = self._mock_delete_task(user_id, task_id)
                 tool_name = "delete_task"
                 response = f"I've removed a task from your list."
 
         elif "update" in user_message_lower or "change" in user_message_lower or "modify" in user_message_lower:
-            # For update task, we'd need to extract the specific task ID and new details
-            # For now, we'll use a simple approach to find a task to update
+            # Extract potential task identifier and new details from the message
+            import re
+            # Look for numbered tasks and new content (e.g., "update task 3 to 'buy milk'", "change task #1 to 'call mom'")
+            task_num_match = re.search(r'(?:task|#)\s*(\d+)', user_message_lower)
+
+            # Extract new title/content using various patterns
+            new_content = None
+            patterns = [
+                r'(?:to|with|new)\s+[\"\']([^\"\']+)[\"\']',  # Matches content in quotes after 'to', 'with', or 'new'
+                r'(?:to|with|new)\s+(.+?)(?:\.|$|please|and|but|if|when|where|how)',  # Matches content after 'to', 'with', or 'new'
+            ]
+
+            for pattern in patterns:
+                match = re.search(pattern, user_message_lower)
+                if match:
+                    new_content = match.group(1).strip()
+                    if new_content:
+                        break
+
             if db_session:
-                # Get user's tasks to find one to update
+                # Get user's tasks
                 tasks = get_user_tasks(db_session, user_id)
+
                 if tasks:
-                    # Just take the first task to update for demo
-                    task_to_update = tasks[0]
-                    tool_result = self._update_task(db_session, user_id, task_to_update.id, task_to_update.title)
-                    tool_name = "update_task"
-                    if tool_result.get("success"):
-                        response = f"I've updated the task '{task_to_update.title}'."
+                    task_to_update = None
+
+                    if task_num_match:
+                        # User specified a task number
+                        task_num = int(task_num_match.group(1))
+                        # Find task by position (1-indexed)
+                        if 1 <= task_num <= len(tasks):
+                            task_to_update = tasks[task_num - 1]
                     else:
-                        response = f"I encountered an error updating the task: {tool_result.get('error', 'Unknown error')}"
+                        # Just take the first task if no specific one mentioned
+                        task_to_update = tasks[0]
+
+                    if task_to_update and new_content:
+                        tool_result = self._update_task(db_session, user_id, task_to_update.id, new_content)
+                        tool_name = "update_task"
+                        if tool_result.get("success"):
+                            response = f"I've updated the task '{task_to_update.title}' to '{new_content}'."
+                        else:
+                            response = f"I encountered an error updating the task: {tool_result.get('error', 'Unknown error')}"
+                    elif task_to_update:
+                        response = f"Please specify what you'd like to update the task '{task_to_update.title}' to."
+                        tool_result = {"error": "No new content provided", "success": False}
+                        tool_name = "update_task"
+                    else:
+                        response = "Could not find the specified task to update."
+                        tool_result = {"error": "Task not found", "success": False}
+                        tool_name = "update_task"
                 else:
                     response = "You don't have any tasks to update."
                     tool_result = {"error": "No tasks found", "success": False}
                     tool_name = "update_task"
             else:
                 # Fallback to mock if no database session provided
-                tool_result = self._mock_update_task(user_id, 123)
+                task_id = int(task_num_match.group(1)) if task_num_match else 123
+                new_title = new_content or "Updated task"
+                tool_result = self._mock_update_task(user_id, task_id, title=new_title)
                 tool_name = "update_task"
                 response = f"I've updated a task in your list."
         else:

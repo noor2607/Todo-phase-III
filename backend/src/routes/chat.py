@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 from typing import List, Optional, Dict, Any
-from database.engine import get_session
-from auth.dependencies import get_current_user
+from ..database.engine import get_session
+from ..auth.dependencies import get_current_user
 from pydantic import BaseModel
-from agents.todo_agent import TodoAgent
+from ..agents.todo_agent import TodoAgent
 
 router = APIRouter()
 
