@@ -127,19 +127,27 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
 
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Check if the response contains task creation tool calls
+      // Check if the response contains any task-related tool calls
       // and trigger the callback if provided
       if (onTaskAction && Array.isArray(toolCalls) && toolCalls.length > 0) {
-        const hasTaskCreationCall = toolCalls.some(toolCall =>
+        const hasTaskRelatedCall = toolCalls.some(toolCall =>
           toolCall.name &&
           (toolCall.name === 'add_task' ||
            toolCall.name.includes('add_task') ||
-           toolCall.name === 'create_task' ||  // Additional check for create_task
+           toolCall.name === 'create_task' ||
            toolCall.name.includes('create_task') ||
+           toolCall.name === 'list_tasks' ||
+           toolCall.name.includes('list_tasks') ||
+           toolCall.name === 'complete_task' ||
+           toolCall.name.includes('complete_task') ||
+           toolCall.name === 'delete_task' ||
+           toolCall.name.includes('delete_task') ||
+           toolCall.name === 'update_task' ||
+           toolCall.name.includes('update_task') ||
            toolCall.result?.success === true)
         );
 
-        if (hasTaskCreationCall) {
+        if (hasTaskRelatedCall) {
           // Small delay to ensure the task is persisted in the database
           setTimeout(() => {
             onTaskAction();
