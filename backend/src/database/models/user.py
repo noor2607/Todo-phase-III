@@ -16,6 +16,7 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     """User model for database storage"""
+    __table_args__ = {"extend_existing": True}
     id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
     hashed_password: str = Field(max_length=255)
     created_at: datetime = Field(default_factory=datetime.utcnow, sa_column=Column(DateTime))

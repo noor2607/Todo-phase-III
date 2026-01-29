@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"\nimport ast\nimport inspect\n\n# Read the auth_routes.py file\nwith open\\(''src/routes/auth_routes.py'', ''r''\\) as f:\n    content = f.read\\(\\)\n\n# Parse the AST to find route decorators\ntree = ast.parse\\(content\\)\n\nroutes = []\nfor node in ast.walk\\(tree\\):\n    if isinstance\\(node, ast.FunctionDef\\):\n        for decorator in node.decorator_list:\n            if isinstance\\(decorator, ast.Call\\) and hasattr\\(decorator, ''func''\\):\n                func_name = ''''\n                if isinstance\\(decorator.func, ast.Attribute\\):\n                    func_name = decorator.func.attr\n                    if func_name in [''get'', ''post'', ''put'', ''patch'', ''delete'']:\n                        # Find the path argument\n                        path_arg = None\n                        if decorator.args:\n                            path_arg = ast.unparse\\(decorator.args[0]\\).strip\\(''\"\"\\\\''''\\)\n                        \n                        routes.append\\({\n                            ''function'': node.name,\n                            ''method'': func_name,\n                            ''path'': path_arg\n                        }\\)\n\nfor route in routes:\n    print\\(f''{route[\"\"method\"\"].upper\\(\\)} {route[\"\"path\"\"]} -> {route[\"\"function\"\"]}''\n\")"
+    ]
+  }
+}

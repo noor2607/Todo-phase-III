@@ -1,10 +1,10 @@
 from sqlmodel import Session, select
 from typing import List, Optional, Dict, Any, Union
-from database.models.task import Task, TaskCreate, TaskUpdate, TaskRead
-from utils.validators import validate_title_length
+from src.database.models.task import Task, TaskCreate, TaskUpdate, TaskRead
+from src.utils.validators import validate_title_length
 from fastapi import HTTPException, status
 from datetime import datetime
-from utils.logging import get_logger
+from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

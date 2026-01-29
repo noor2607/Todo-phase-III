@@ -58,26 +58,50 @@ def chat_endpoint(
         ChatResponse with conversation_id, response, and tool_calls
     """
     # Use the original user ID string to maintain consistency with task retrieval
-    user_id = current_user_id
+    # Convert to int for internal operations, but handle both string and int formats
+    if isinstance(current_user_id, str):
+        try:
+            user_id = int(current_user_id)
+        except ValueError:
+            # If it's not a numeric string, we'll pass it as-is and let individual methods handle it
+            user_id = current_user_id
+    else:
+        user_id = current_user_id
 
     try:
         # Initialize and run AI agent
         agent = TodoAgent()
+
+        # Check if API key is available, if not provide appropriate response
+        if not agent.has_api_key:
+            return ChatResponse(
+                conversation_id=request.conversation_id or (int(current_user_id) if isinstance(current_user_id, (int, str)) and str(current_user_id).isdigit() else 1),
+                response="AI service is currently unavailable. Please set up the COHERE_API_KEY in the backend environment variables.",
+                tool_calls=[]
+            )
+
         agent_result = agent.run_agent(request.message, user_id, session)
 
         ai_response = agent_result.get("response", "I processed your request.")
         tool_calls = agent_result.get("tool_calls", [])
 
         # For now, return a conversation ID (in a real implementation, you would create conversation records in the database)
-        conversation_id = request.conversation_id or user_id  # Use user_id as conversation ID if not provided
+        conversation_id = request.conversation_id or (int(user_id) if isinstance(user_id, (int, str)) and str(user_id).isdigit() else 1)
 
         return ChatResponse(
             conversation_id=conversation_id,
             response=ai_response,
             tool_calls=tool_calls
         )
+    except ValueError as ve:
+        # Handle specific value errors (like user_id conversion issues)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid user ID format: {str(ve)}"
+        )
     except Exception as e:
         # Handle agent errors gracefully
+        print(f"Error in chat endpoint: {str(e)}")  # Log the error for debugging
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing chat request: {str(e)}"

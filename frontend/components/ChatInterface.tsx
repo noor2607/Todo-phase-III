@@ -77,12 +77,16 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
       let chatResponse;
 
       // Check if response follows ApiResponse<ChatResponse> structure
-      if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-        // It's wrapped in ApiResponse
-        chatResponse = (response.data as any).data;
+      if (response.data && typeof response.data === 'object') {
+        if ('data' in response.data && response.data.data) {
+          // It's wrapped in ApiResponse
+          chatResponse = response.data.data;
+        } else {
+          // Direct ChatResponse structure
+          chatResponse = response.data;
+        }
       } else {
-        // Direct ChatResponse structure
-        chatResponse = response.data;
+        throw new Error('Invalid response format from chat API');
       }
 
       if (!chatResponse) {
@@ -90,8 +94,24 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
       }
 
       // Ensure we have the expected properties
-      const assistantResponse = chatResponse.response || chatResponse.data?.response || 'I processed your request.';
-      const toolCalls = chatResponse.tool_calls || chatResponse.data?.tool_calls || [];
+      const assistantResponse = chatResponse.response || 'I processed your request.';
+      const toolCalls = chatResponse.tool_calls || [];
+
+      // Check if the response indicates that the AI service is unavailable
+      if (assistantResponse.toLowerCase().includes('ai service is currently unavailable') ||
+          assistantResponse.toLowerCase().includes('cohere_api_key')) {
+        // Show a special message to the user indicating setup is needed
+        const setupMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `${assistantResponse}\n\nNote: You can still manage tasks manually using the task interface.`,
+          timestamp: new Date(),
+          isError: true
+        };
+
+        setMessages(prev => [...prev, setupMessage]);
+        return; // Exit early as this is an informational message, not an error
+      }
 
       // Add assistant response to the chat
       const assistantMessage: Message = {

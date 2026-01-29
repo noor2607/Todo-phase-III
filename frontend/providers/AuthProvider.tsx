@@ -34,13 +34,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const authenticated = await isAuthenticated();
         if (authenticated) {
-          // In a real implementation, we would fetch user data
-          // For now, we'll retrieve user data from localStorage or use mock data
-          const userData = localStorage.getItem('user_data');
+          // Retrieve user data from localStorage
+          const userData = localStorage.getItem('user');
           if (userData) {
             setUser(JSON.parse(userData));
           } else {
-            setUser({ id: 'mock-user-id', email: 'user@example.com' });
+            // If no user data in localStorage but token exists,
+            // the auth state is inconsistent - log out the user
+            console.warn('Token exists but no user data found. Logging out.');
+            authLogout();
+            setUser(null);
           }
         } else {
           setUser(null);

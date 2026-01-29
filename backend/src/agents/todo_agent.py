@@ -1,8 +1,8 @@
 import os
 from typing import Dict, Any
 from dotenv import load_dotenv
-from services.task_service import create_task, get_user_tasks, update_task_completion, delete_task_by_id
-from database.models.task import Task
+from src.services.task_service import create_task, get_user_tasks, update_task_completion, delete_task_by_id
+from src.database.models.task import Task
 from sqlmodel import Session
 
 # Load environment variables
@@ -59,7 +59,9 @@ class TodoAgent:
         """Real implementation of list_tasks tool."""
         try:
             # Get tasks for the user using standalone function
-            tasks = get_user_tasks(db_session, user_id)
+            # Ensure user_id is converted to string for consistency with database
+            user_id_str = str(user_id)
+            tasks = get_user_tasks(db_session, user_id_str)
 
             # Filter by status if specified
             if status:
@@ -90,11 +92,21 @@ class TodoAgent:
         """Real implementation of complete_task tool."""
         try:
             # Update task completion status using standalone function
+            # Get user's tasks to ensure the task belongs to the user
+            user_id_str = str(user_id)
+            from sqlmodel import select
+            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id_str)).first()
+
+            if not task:
+                return {
+                    "error": "Task not found or not owned by user",
+                    "success": False
+                }
+
             success = update_task_completion(db_session, task_id, True)
 
             if success:
                 # Get the updated task to return details
-                from sqlmodel import select
                 task = db_session.exec(select(Task).where(Task.id == task_id)).first()
                 if task:
                     return {
@@ -122,6 +134,17 @@ class TodoAgent:
     def _delete_task(self, db_session: Session, user_id: int, task_id: int) -> Dict[str, Any]:
         """Real implementation of delete_task tool."""
         try:
+            # Check if the task belongs to the user before deleting
+            user_id_str = str(user_id)
+            from sqlmodel import select
+            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id_str)).first()
+
+            if not task:
+                return {
+                    "error": "Task not found or not owned by user",
+                    "success": False
+                }
+
             # Delete the task using standalone function
             success = delete_task_by_id(db_session, task_id)
 
@@ -145,9 +168,10 @@ class TodoAgent:
     def _update_task(self, db_session: Session, user_id: int, task_id: int, title: str = None, description: str = None) -> Dict[str, Any]:
         """Real implementation of update_task tool."""
         try:
-            # Get the existing task
+            # Get the existing task and ensure it belongs to the user
+            user_id_str = str(user_id)
             from sqlmodel import select
-            task = db_session.exec(select(Task).where(Task.id == task_id)).first()
+            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id_str)).first()
 
             if not task:
                 return {
@@ -259,7 +283,8 @@ class TodoAgent:
             # For now, we'll use a simple approach to find a task to complete
             if db_session:
                 # Get user's tasks to find one to complete
-                tasks = get_user_tasks(db_session, user_id)
+                user_id_str = str(user_id)
+                tasks = get_user_tasks(db_session, user_id_str)
                 if tasks:
                     # Find a pending task to complete (just taking the first one for demo)
                     pending_task = next((t for t in tasks if not t.completed), None)
@@ -289,7 +314,8 @@ class TodoAgent:
             # For now, we'll use a simple approach to find a task to delete
             if db_session:
                 # Get user's tasks to find one to delete
-                tasks = get_user_tasks(db_session, user_id)
+                user_id_str = str(user_id)
+                tasks = get_user_tasks(db_session, user_id_str)
                 if tasks:
                     # Just take the first task to delete for demo
                     task_to_delete = tasks[0]

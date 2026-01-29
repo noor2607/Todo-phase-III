@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
+from contextlib import asynccontextmanager
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from routes.api import router as api_router
 from routes.auth_routes import router as auth_router
 from routes.tasks import router as tasks_router
@@ -12,11 +14,20 @@ from config.settings import settings
 from database.engine import init_db
 
 
-# Create FastAPI app instance
+# Create FastAPI app instance with lifespan
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    init_db()
+    yield
+    # Shutdown (if needed)
+
+
 app = FastAPI(
     title="Todo App Backend",
     description="Backend service for Todo application with authentication, task management, and AI chat functionality",
     version="1.0.0",
+    lifespan=lifespan
 )
 
 # Add security middleware
@@ -36,11 +47,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
-
-# Initialize database
-@app.on_event("startup")
-def on_startup():
-    init_db()
 
 # Include authentication routes
 app.include_router(api_router, prefix="/api", tags=["authentication"])

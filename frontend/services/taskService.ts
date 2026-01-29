@@ -16,7 +16,7 @@ export const taskService = {
       if (sortBy) params.append('sort', sortBy);
 
       const queryString = params.toString();
-      const url = `/tasks${queryString ? '?' + queryString : ''}`;
+      const url = `/api/tasks${queryString ? '?' + queryString : ''}`;
 
       const response = await api.get<Task[]>(url);
       return response.data.data || [];
