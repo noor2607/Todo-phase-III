@@ -74,7 +74,7 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
       const response = await chatApi.post(`/api/chat`, requestBody);
 
       // Handle different possible response structures from the backend
-      let chatResponse;
+      let chatResponse: any;
 
       // Check if response follows ApiResponse<ChatResponse> structure
       if (response.data && typeof response.data === 'object') {
@@ -93,9 +93,13 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
         throw new Error('Invalid response from chat API');
       }
 
-      // Ensure we have the expected properties
-      const assistantResponse = chatResponse.response || 'I processed your request.';
-      const toolCalls = chatResponse.tool_calls || [];
+      // Ensure we have the expected properties with type safety
+      const assistantResponse = typeof chatResponse === 'object' && 'response' in chatResponse
+        ? chatResponse.response
+        : 'I processed your request.';
+      const toolCalls = typeof chatResponse === 'object' && 'tool_calls' in chatResponse
+        ? chatResponse.tool_calls
+        : [];
 
       // Check if the response indicates that the AI service is unavailable
       if (assistantResponse.toLowerCase().includes('ai service is currently unavailable') ||
