@@ -118,7 +118,7 @@ const TaskForm = ({ task, onClose, onSuccess }: TaskFormProps) => {
       }
 
       // Use error handler to show user-friendly message
-      import('../../utils/errorHandler').then(module => {
+      import('../utils/errorHandler').then(module => {
         module.default.notify(errorMessage, 'error');
       });
 

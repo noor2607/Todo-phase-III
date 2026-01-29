@@ -120,7 +120,7 @@ const SignupPage = () => {
       setError(errorMessage);
 
       // Also show in error handler
-      import('../../utils/errorHandler').then(module => {
+      import('../utils/errorHandler').then(module => {
         module.default.notify(errorMessage, 'error');
       });
     } finally {
