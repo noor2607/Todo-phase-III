@@ -16,7 +16,6 @@ is_postgres = DATABASE_URL.startswith("postgresql://") or DATABASE_URL.startswit
 # Fix the async database URL format
 if is_sqlite:
     ASYNC_DATABASE_URL = DATABASE_URL.replace("sqlite:///", "sqlite+aiosqlite:///", 1)
-    ASYNC_DATABASE_URL = ASYNC_DATABASE_URL.replace("sqlite://", "sqlite+aiosqlite:///", 1)
 elif DATABASE_URL.startswith("postgresql://"):
     # Convert PostgreSQL to asyncpg driver
     ASYNC_DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
