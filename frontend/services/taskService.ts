@@ -20,8 +20,24 @@ export const taskService = {
 
       const response = await api.get<Task[]>(url);
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching tasks:', error);
+
+      // Determine error message based on error type
+      let errorMessage = 'Failed to fetch tasks. Please try again.';
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Please log in again.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Import and use error handler to show user-friendly message
+      import('../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
+
       throw error;
     }
   },
@@ -38,8 +54,24 @@ export const taskService = {
         throw new Error('Failed to create task: no data returned');
       }
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating task:', error);
+
+      // Determine error message based on error type
+      let errorMessage = 'Failed to create task. Please try again.';
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Cannot create task.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Import and use error handler to show user-friendly message
+      import('../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
+
       throw error;
     }
   },
@@ -56,8 +88,26 @@ export const taskService = {
         throw new Error(`Failed to fetch task with ID ${taskId}: no data returned`);
       }
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error fetching task with ID ${taskId}:`, error);
+
+      // Determine error message based on error type
+      let errorMessage = `Failed to fetch task with ID ${taskId}. Please try again.`;
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Cannot access this task.';
+      } else if (error.response?.status === 404) {
+        errorMessage = `Task with ID ${taskId} not found.`;
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Import and use error handler to show user-friendly message
+      import('../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
+
       throw error;
     }
   },
@@ -75,8 +125,26 @@ export const taskService = {
         throw new Error(`Failed to update task with ID ${taskId}: no data returned`);
       }
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error updating task with ID ${taskId}:`, error);
+
+      // Determine error message based on error type
+      let errorMessage = `Failed to update task with ID ${taskId}. Please try again.`;
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Cannot update this task.';
+      } else if (error.response?.status === 404) {
+        errorMessage = `Task with ID ${taskId} not found.`;
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Import and use error handler to show user-friendly message
+      import('../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
+
       throw error;
     }
   },
@@ -93,8 +161,26 @@ export const taskService = {
         throw new Error(`Failed to toggle completion for task with ID ${taskId}: no data returned`);
       }
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error toggling completion for task with ID ${taskId}:`, error);
+
+      // Determine error message based on error type
+      let errorMessage = `Failed to update task completion status. Please try again.`;
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Cannot update this task.';
+      } else if (error.response?.status === 404) {
+        errorMessage = `Task with ID ${taskId} not found.`;
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Import and use error handler to show user-friendly message
+      import('../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
+
       throw error;
     }
   },
@@ -108,8 +194,26 @@ export const taskService = {
     try {
       await api.delete(`/api/tasks/${taskId}`);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting task with ID ${taskId}:`, error);
+
+      // Determine error message based on error type
+      let errorMessage = `Failed to delete task with ID ${taskId}. Please try again.`;
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Cannot delete this task.';
+      } else if (error.response?.status === 404) {
+        errorMessage = `Task with ID ${taskId} not found.`;
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Import and use error handler to show user-friendly message
+      import('../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
+
       throw error;
     }
   }

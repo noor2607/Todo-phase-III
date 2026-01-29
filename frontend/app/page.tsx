@@ -12,6 +12,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ChatbotIcon from '../components/ChatbotIcon';
 import ChatInterface from '../components/ChatInterface';
+import ErrorDisplay from '../components/ErrorDisplay';
 
 interface FilterOptions {
   status: 'all' | 'pending' | 'completed';
@@ -318,6 +319,9 @@ export default function HomePage() {
 
       {/* Chatbot Icon - Only show for authenticated users */}
       <ChatbotIcon onClick={() => setShowChatInterface(true)} />
+
+      {/* Error Display Component */}
+      <ErrorDisplay position="top-right" />
 
       <Footer />
     </div>

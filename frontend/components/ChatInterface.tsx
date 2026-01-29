@@ -130,6 +130,8 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
           toolCall.name &&
           (toolCall.name === 'add_task' ||
            toolCall.name.includes('add_task') ||
+           toolCall.name === 'create_task' ||  // Additional check for create_task
+           toolCall.name.includes('create_task') ||
            toolCall.result?.success === true)
         );
 
@@ -177,9 +179,19 @@ const ChatInterface = ({ isOpen, onClose, onTaskAction }: ChatInterfaceProps) =>
       } else if (error.request) {
         // Request was made but no response received
         errorMessageText = 'Network error. Please check your connection and try again.';
+
+        // Also show in error handler
+        import('../utils/errorHandler').then(module => {
+          module.default.notify('Network error. Please check your connection.', 'error');
+        });
       } else {
         // Something else happened
         errorMessageText = 'An unexpected error occurred. Please try again.';
+
+        // Also show in error handler
+        import('../utils/errorHandler').then(module => {
+          module.default.notify('An unexpected error occurred.', 'error');
+        });
       }
 
       // Add error message to the chat

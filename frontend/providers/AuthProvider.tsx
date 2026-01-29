@@ -32,20 +32,81 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkInitialAuth = async () => {
       try {
-        const authenticated = await isAuthenticated();
-        if (authenticated) {
-          // Retrieve user data from localStorage
-          const userData = localStorage.getItem('user');
-          if (userData) {
-            setUser(JSON.parse(userData));
-          } else {
-            // If no user data in localStorage but token exists,
-            // the auth state is inconsistent - log out the user
-            console.warn('Token exists but no user data found. Logging out.');
-            authLogout();
-            setUser(null);
+        // Verify token with the backend as well
+        const token = getAuthToken();
+        if (token) {
+          // Try to verify the token with the backend
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/verify`, {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (!response.ok) {
+              // Token is invalid according to backend, log out user
+              console.warn('Token verification failed with backend. Logging out.');
+              authLogout();
+              setUser(null);
+              return;
+            }
+
+            const result = await response.json();
+            if (result.success) {
+              // Token is valid, retrieve user data
+              const userData = localStorage.getItem('user');
+              if (userData) {
+                setUser(JSON.parse(userData));
+              } else {
+                // If no user data in localStorage but token exists,
+                // try to fetch user profile from backend
+                const profileResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/profile`, {
+                  method: 'GET',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                  },
+                });
+
+                if (profileResponse.ok) {
+                  const profileData = await profileResponse.json();
+                  setUser(profileData.data || { id: 'unknown', email: 'unknown' });
+                  // Store user data in localStorage for future use
+                  localStorage.setItem('user', JSON.stringify(profileData.data || { id: 'unknown', email: 'unknown' }));
+                } else {
+                  console.warn('Could not fetch user profile. Logging out.');
+                  authLogout();
+                  setUser(null);
+                  return;
+                }
+              }
+            } else {
+              // Token verification failed
+              console.warn('Token verification failed. Logging out.');
+              authLogout();
+              setUser(null);
+            }
+          } catch (backendError) {
+            console.error('Error verifying token with backend:', backendError);
+            // If we can't reach the backend, we'll fall back to local verification
+            const authenticated = isAuthenticated();
+            if (authenticated) {
+              const userData = localStorage.getItem('user');
+              if (userData) {
+                setUser(JSON.parse(userData));
+              } else {
+                console.warn('Token exists locally but no user data found. Logging out.');
+                authLogout();
+                setUser(null);
+              }
+            } else {
+              setUser(null);
+            }
           }
         } else {
+          // No token in localStorage
           setUser(null);
         }
       } catch (error) {

@@ -104,9 +104,25 @@ const TaskForm = ({ task, onClose, onSuccess }: TaskFormProps) => {
       }
 
       onSuccess(response);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error ${isEditing ? 'updating' : 'creating'} task:`, error);
-      setErrors({ form: `Failed to ${isEditing ? 'update' : 'create'} task` });
+
+      // Determine error message based on error type
+      let errorMessage = `Failed to ${isEditing ? 'update' : 'create'} task`;
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Cannot perform this action.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Use error handler to show user-friendly message
+      import('../../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
+
+      setErrors({ form: errorMessage });
     } finally {
       setLoading(false);
     }

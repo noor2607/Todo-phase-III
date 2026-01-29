@@ -109,9 +109,20 @@ const SignupPage = () => {
         const errorMessage = result.error || result.message || result.detail || 'Failed to create account';
         setError(errorMessage);
       }
-    } catch (err) {
-      setError('An unexpected error occurred');
+    } catch (err: any) {
       console.error(err);
+
+      let errorMessage = 'An unexpected error occurred';
+      if (err.message?.includes('Network Error')) {
+        errorMessage = 'Network error. Please check your connection.';
+      }
+
+      setError(errorMessage);
+
+      // Also show in error handler
+      import('../../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
     } finally {
       setLoading(false);
     }

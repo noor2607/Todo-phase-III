@@ -4,21 +4,7 @@ from typing import List, Optional, Dict, Any
 from database.engine import get_session
 from auth.dependencies import get_current_user
 from pydantic import BaseModel
-
-# Import the TodoAgent from the local agents directory
-import sys
-import os
-
-# Add the src directory to the Python path so we can import from agents
-current_dir = os.path.dirname(os.path.abspath(__file__))
-src_dir = os.path.dirname(current_dir)
-agents_dir = os.path.join(src_dir, 'agents')
-
-# Add to path if not already there
-if agents_dir not in sys.path:
-    sys.path.insert(0, agents_dir)
-
-from todo_agent import TodoAgent
+from agents.todo_agent import TodoAgent
 
 router = APIRouter()
 
@@ -57,9 +43,9 @@ def chat_endpoint(
     Returns:
         ChatResponse with conversation_id, response, and tool_calls
     """
-    # Use the original user ID string to maintain consistency with task retrieval
-    # Don't convert to int to maintain the exact same format as in the JWT token
-    user_id = current_user_id
+    # Always use the user_id from the JWT token, never trust any user_id from the request body
+    # This ensures security by deriving the user identity from the authenticated session
+    authenticated_user_id = str(current_user_id)
 
     try:
         # Initialize and run AI agent
@@ -68,18 +54,19 @@ def chat_endpoint(
         # Check if API key is available, if not provide appropriate response
         if not agent.has_api_key:
             return ChatResponse(
-                conversation_id=request.conversation_id or 1,
+                conversation_id=request.conversation_id or (int(authenticated_user_id) if isinstance(authenticated_user_id, (int, str)) and str(authenticated_user_id).isdigit() else 1),
                 response="AI service is currently unavailable. Please set up the COHERE_API_KEY in the backend environment variables.",
                 tool_calls=[]
             )
 
-        agent_result = agent.run_agent(request.message, user_id, session)
+        # Pass the authenticated user ID to ensure all tasks created through chat are linked to the authenticated user
+        agent_result = agent.run_agent(request.message, authenticated_user_id, session)
 
         ai_response = agent_result.get("response", "I processed your request.")
         tool_calls = agent_result.get("tool_calls", [])
 
         # For now, return a conversation ID (in a real implementation, you would create conversation records in the database)
-        conversation_id = request.conversation_id or 1
+        conversation_id = request.conversation_id or (int(authenticated_user_id) if isinstance(authenticated_user_id, (int, str)) and str(authenticated_user_id).isdigit() else 1)
 
         return ChatResponse(
             conversation_id=conversation_id,

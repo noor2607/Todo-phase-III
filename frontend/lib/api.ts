@@ -27,6 +27,11 @@ mainApiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Ensure the config URL includes the full API path
+    if (!config.url?.startsWith('http') && !config.url?.startsWith('/api')) {
+      config.url = `/api${config.url}`;
+    }
+
     return config;
   },
   (error) => {
@@ -41,6 +46,11 @@ chatApiClient.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Ensure the config URL includes the full API path
+    if (!config.url?.startsWith('http') && !config.url?.startsWith('/api')) {
+      config.url = `/api${config.url}`;
     }
 
     return config;

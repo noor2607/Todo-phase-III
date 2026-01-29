@@ -17,14 +17,10 @@ const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) => {
   const handleToggleCompleted = async () => {
     setIsUpdating(true);
     try {
-      const response = await taskService.updateTask(Number(task.id), {
-        ...task,
-        completed: !task.completed
-      });
-
+      const response = await taskService.toggleTaskCompletion(Number(task.id));
       onUpdate(response);
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.error('Error toggling task completion:', error);
     } finally {
       setIsUpdating(false);
     }
@@ -37,8 +33,25 @@ const TaskCard = ({ task, onEdit, onDelete, onUpdate }: TaskCardProps) => {
       if (success) {
         onDelete(String(task.id));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting task:', error);
+
+      // Determine error message based on error type
+      let errorMessage = 'Failed to delete task. Please try again.';
+      if (error.response?.status === 401) {
+        errorMessage = 'Session expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. Cannot delete this task.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Task not found.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      // Use error handler to show user-friendly message
+      import('../../utils/errorHandler').then(module => {
+        module.default.notify(errorMessage, 'error');
+      });
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
