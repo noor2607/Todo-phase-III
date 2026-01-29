@@ -28,7 +28,7 @@ class TodoAgent:
             "update_task": self._update_task
         }
 
-    def _add_task(self, db_session: Session, user_id: int, title: str, description: str = None) -> Dict[str, Any]:
+    def _add_task(self, db_session: Session, user_id: str, title: str, description: str = None) -> Dict[str, Any]:
         """Real implementation of add_task tool."""
         try:
             # Create the task using the task service
@@ -36,7 +36,7 @@ class TodoAgent:
                 "title": title,
                 "description": description or "",
                 "completed": False,
-                "user_id": str(user_id)  # Convert to string to match expected format
+                "user_id": user_id  # Use the user_id as-is to maintain consistency
             }
 
             # Create task in the database using standalone function
@@ -55,13 +55,12 @@ class TodoAgent:
                 "success": False
             }
 
-    def _list_tasks(self, db_session: Session, user_id: int, status: str = None) -> Dict[str, Any]:
+    def _list_tasks(self, db_session: Session, user_id: str, status: str = None) -> Dict[str, Any]:
         """Real implementation of list_tasks tool."""
         try:
             # Get tasks for the user using standalone function
-            # Ensure user_id is converted to string for consistency with database
-            user_id_str = str(user_id)
-            tasks = get_user_tasks(db_session, user_id_str)
+            # Use the user_id as-is to maintain consistency
+            tasks = get_user_tasks(db_session, user_id)
 
             # Filter by status if specified
             if status:
@@ -88,14 +87,13 @@ class TodoAgent:
                 "success": False
             }
 
-    def _complete_task(self, db_session: Session, user_id: int, task_id: int) -> Dict[str, Any]:
+    def _complete_task(self, db_session: Session, user_id: str, task_id: int) -> Dict[str, Any]:
         """Real implementation of complete_task tool."""
         try:
             # Update task completion status using standalone function
             # Get user's tasks to ensure the task belongs to the user
-            user_id_str = str(user_id)
             from sqlmodel import select
-            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id_str)).first()
+            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id)).first()
 
             if not task:
                 return {
@@ -131,13 +129,12 @@ class TodoAgent:
                 "success": False
             }
 
-    def _delete_task(self, db_session: Session, user_id: int, task_id: int) -> Dict[str, Any]:
+    def _delete_task(self, db_session: Session, user_id: str, task_id: int) -> Dict[str, Any]:
         """Real implementation of delete_task tool."""
         try:
             # Check if the task belongs to the user before deleting
-            user_id_str = str(user_id)
             from sqlmodel import select
-            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id_str)).first()
+            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id)).first()
 
             if not task:
                 return {
@@ -165,13 +162,12 @@ class TodoAgent:
                 "success": False
             }
 
-    def _update_task(self, db_session: Session, user_id: int, task_id: int, title: str = None, description: str = None) -> Dict[str, Any]:
+    def _update_task(self, db_session: Session, user_id: str, task_id: int, title: str = None, description: str = None) -> Dict[str, Any]:
         """Real implementation of update_task tool."""
         try:
             # Get the existing task and ensure it belongs to the user
-            user_id_str = str(user_id)
             from sqlmodel import select
-            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id_str)).first()
+            task = db_session.exec(select(Task).where(Task.id == task_id).where(Task.user_id == user_id)).first()
 
             if not task:
                 return {
@@ -202,7 +198,7 @@ class TodoAgent:
                 "success": False
             }
 
-    def run_agent(self, user_message: str, user_id: int, db_session: Session = None) -> Dict[str, Any]:
+    def run_agent(self, user_message: str, user_id: str, db_session: Session = None) -> Dict[str, Any]:
         """
         Run the AI agent with the user's message.
 
@@ -283,8 +279,7 @@ class TodoAgent:
             # For now, we'll use a simple approach to find a task to complete
             if db_session:
                 # Get user's tasks to find one to complete
-                user_id_str = str(user_id)
-                tasks = get_user_tasks(db_session, user_id_str)
+                tasks = get_user_tasks(db_session, user_id)
                 if tasks:
                     # Find a pending task to complete (just taking the first one for demo)
                     pending_task = next((t for t in tasks if not t.completed), None)
@@ -314,8 +309,7 @@ class TodoAgent:
             # For now, we'll use a simple approach to find a task to delete
             if db_session:
                 # Get user's tasks to find one to delete
-                user_id_str = str(user_id)
-                tasks = get_user_tasks(db_session, user_id_str)
+                tasks = get_user_tasks(db_session, user_id)
                 if tasks:
                     # Just take the first task to delete for demo
                     task_to_delete = tasks[0]
@@ -379,7 +373,7 @@ class TodoAgent:
             "tool_calls": tool_calls
         }
 
-    def _mock_add_task(self, user_id: int, title: str, description: str = None) -> Dict[str, Any]:
+    def _mock_add_task(self, user_id: str, title: str, description: str = None) -> Dict[str, Any]:
         """Mock implementation of add_task tool."""
         return {
             "task_id": 123,  # Mock ID
@@ -389,7 +383,7 @@ class TodoAgent:
             "success": True
         }
 
-    def _mock_list_tasks(self, user_id: int, status: str = None) -> Dict[str, Any]:
+    def _mock_list_tasks(self, user_id: str, status: str = None) -> Dict[str, Any]:
         """Mock implementation of list_tasks tool."""
         return {
             "tasks": [
@@ -402,7 +396,7 @@ class TodoAgent:
             "success": True
         }
 
-    def _mock_complete_task(self, user_id: int, task_id: int) -> Dict[str, Any]:
+    def _mock_complete_task(self, user_id: str, task_id: int) -> Dict[str, Any]:
         """Mock implementation of complete_task tool."""
         return {
             "task_id": task_id,
@@ -411,7 +405,7 @@ class TodoAgent:
             "success": True
         }
 
-    def _mock_delete_task(self, user_id: int, task_id: int) -> Dict[str, Any]:
+    def _mock_delete_task(self, user_id: str, task_id: int) -> Dict[str, Any]:
         """Mock implementation of delete_task tool."""
         return {
             "task_id": task_id,
@@ -419,7 +413,7 @@ class TodoAgent:
             "success": True
         }
 
-    def _mock_update_task(self, user_id: int, task_id: int, title: str = None, description: str = None) -> Dict[str, Any]:
+    def _mock_update_task(self, user_id: str, task_id: int, title: str = None, description: str = None) -> Dict[str, Any]:
         """Mock implementation of update_task tool."""
         return {
             "task_id": task_id,

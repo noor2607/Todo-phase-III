@@ -58,15 +58,8 @@ def chat_endpoint(
         ChatResponse with conversation_id, response, and tool_calls
     """
     # Use the original user ID string to maintain consistency with task retrieval
-    # Convert to int for internal operations, but handle both string and int formats
-    if isinstance(current_user_id, str):
-        try:
-            user_id = int(current_user_id)
-        except ValueError:
-            # If it's not a numeric string, we'll pass it as-is and let individual methods handle it
-            user_id = current_user_id
-    else:
-        user_id = current_user_id
+    # Don't convert to int to maintain the exact same format as in the JWT token
+    user_id = current_user_id
 
     try:
         # Initialize and run AI agent
@@ -75,7 +68,7 @@ def chat_endpoint(
         # Check if API key is available, if not provide appropriate response
         if not agent.has_api_key:
             return ChatResponse(
-                conversation_id=request.conversation_id or (int(current_user_id) if isinstance(current_user_id, (int, str)) and str(current_user_id).isdigit() else 1),
+                conversation_id=request.conversation_id or 1,
                 response="AI service is currently unavailable. Please set up the COHERE_API_KEY in the backend environment variables.",
                 tool_calls=[]
             )
@@ -86,7 +79,7 @@ def chat_endpoint(
         tool_calls = agent_result.get("tool_calls", [])
 
         # For now, return a conversation ID (in a real implementation, you would create conversation records in the database)
-        conversation_id = request.conversation_id or (int(user_id) if isinstance(user_id, (int, str)) and str(user_id).isdigit() else 1)
+        conversation_id = request.conversation_id or 1
 
         return ChatResponse(
             conversation_id=conversation_id,
